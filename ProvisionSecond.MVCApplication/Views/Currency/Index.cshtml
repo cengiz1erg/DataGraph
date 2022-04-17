@@ -4,7 +4,7 @@
 <div id="container">
     <h3>Currency Search</h3>
     <div class="input-group mb-3">
-        <input type="text" class="form-control" placeholder="Currency Code" aria-label="Recipient's username" aria-describedby="basic-addon2" id="inputCurrencyCode">
+        <input type="text" class="form-control" placeholder="Currency Code" aria-label="Currency Code" aria-describedby="basic-addon2" id="inputCurrencyCode">
         <div class="input-group-append">
             <button class="btn btn-outline-secondary" type="button" id="myButton">Search</button>
         </div>
@@ -18,98 +18,103 @@
 {
     <script>
         var Currencies = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Currencies));
-
-        $("#myButton").click(function () {
-            var input = $("#inputCurrencyCode").val().toUpperCase();
-            var inputInCurrencies = Currencies.includes(input);
-            if (inputInCurrencies) {
-                var model = {
-                    input: input
-                };
-                $.ajax({
-                    url: '@Url.Action("GetCurrencyData", "Currency")',
-                    type: "POST",
-                    data: model,
-                    dataType: "json",
-                    error: function(request, status, error) {
-                        //console.log(request);
-                    },
-                    success: function(response) {
-                        console.log(response);
-                        $("#myChart").html("");
-                        var label = d3.select(".label");
-                        // Set the dimensions of the canvas / graph
-                        var margin = { top: 30, right: 20, bottom: 30, left: 50 },
-                            width = 1000 - margin.left - margin.right,
-                            height = 270 - margin.top - margin.bottom;
-                        // Parse the date / time
-                        var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S").parse;
-                        // Set the ranges
-                        var x = d3.time.scale().range([0, width]);
-                        var y = d3.scale.linear().range([height, 0]);
-                        // Define the axes
-                        var xAxis = d3.svg.axis().scale(x)
-                            .orient("bottom").ticks(5);
-                        var yAxis = d3.svg.axis().scale(y)
-                            .orient("left").ticks(5);
-                        // Define the line
-                        var valueline = d3.svg.line()
-                            .x(function (d) { return x(d.dateTime); })
-                            .y(function (d) { return y(d.forexBuying); });
-                        // Adds the svg canvas
-                        var svg = d3.select("#myChart")
-                            .append("svg")
-                            .attr("width", width + margin.left + margin.right)
-                            .attr("height", height + margin.top + margin.bottom)
-                            .append("g")
-                            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-                        //
-                        response.forEach(function (d) {
-                            d.dateTime = parseDate(d.dateTime);
-                            d.forexBuying = +d.forexBuying;
-                        });
-                        // Scale the range of the data
-                        var max = d3.max(response, function (d) { return d.forexBuying; })
-                        var min = d3.min(response, function (d) { return d.forexBuying; })
-                        var value = ((max + min) * 3) / 200
-                        x.domain(d3.extent(response, function (d) { return d.dateTime; }));
-                        y.domain([min - value, max + value]);
-                        // Add the valueline path.
-                        svg.append("path")
-                            .attr("class", "line")
-                            .attr("d", valueline(response));
-                        //
-                        svg
-                            .selectAll("circle")
-                            .data(response)
-                            .enter()
-                            .append("circle")
-                            .attr("r", 8)
-                            .attr("cx", function (d) {
-                                return x(d.dateTime)
-                            })
-                            .attr("cy", function (d) {
-                                return y(d.forexBuying)
-                            })
-                            .on("mouseover", function (d, i) {
-                                label.style("transform", "translate(" + x(d.dateTime) + "px," + (y(d.forexBuying)) + "px)")
-                                label.text(d.forexBuying)
+        if (Currencies.length != 0) {
+            $("#myButton").click(function () {
+                var input = $("#inputCurrencyCode").val().toUpperCase();
+                var inputInCurrencies = Currencies.includes(input);
+                if (inputInCurrencies) {
+                    var model = {
+                        input: input
+                    };
+                    $.ajax({
+                        url: '@Url.Action("GetCurrencyData", "Currency")',
+                        type: "POST",
+                        data: model,
+                        dataType: "json",
+                        error: function (request, status, error) {
+                            //console.log(request);
+                        },
+                        success: function (response) {
+                            /*console.log(response);*/
+                            $("#myChart").html("");
+                            var label = d3.select(".label");
+                            // Set the dimensions of the canvas / graph
+                            var margin = { top: 30, right: 20, bottom: 30, left: 50 },
+                                width = 1000 - margin.left - margin.right,
+                                height = 270 - margin.top - margin.bottom;
+                            // Parse the date / time
+                            var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S").parse;
+                            // Set the ranges
+                            var x = d3.time.scale().range([0, width]);
+                            var y = d3.scale.linear().range([height, 0]);
+                            // Define the axes
+                            var xAxis = d3.svg.axis().scale(x)
+                                .orient("bottom").ticks(5);
+                            var yAxis = d3.svg.axis().scale(y)
+                                .orient("left").ticks(5);
+                            // Define the line
+                            var valueline = d3.svg.line()
+                                .x(function (d) { return x(d.dateTime); })
+                                .y(function (d) { return y(d.forexBuying); });
+                            // Adds the svg canvas
+                            var svg = d3.select("#myChart")
+                                .append("svg")
+                                .attr("width", width + margin.left + margin.right)
+                                .attr("height", height + margin.top + margin.bottom)
+                                .append("g")
+                                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                            //
+                            response.forEach(function (d) {
+                                d.dateTime = parseDate(d.dateTime);
+                                d.forexBuying = +d.forexBuying;
                             });
-                        // Add the X Axis
-                        svg.append("g")	
-                            .attr("class", "x axis")
-                            .attr("transform", "translate(0," + height + ")")
-                            .call(xAxis);
-                        // Add the Y Axis
-                        svg.append("g")
-                            .attr("class", "y axis")
-                            .call(yAxis);
-                    }
-                });
-            } else {
-                alert("Wrong Input")
-            }
-        });
+                            // Scale the range of the data
+                            var max = d3.max(response, function (d) { return d.forexBuying; })
+                            var min = d3.min(response, function (d) { return d.forexBuying; })
+                            var value = ((max + min) * 5) / 200
+                            x.domain(d3.extent(response, function (d) { return d.dateTime; }));
+                            y.domain([min - value, max + value]);
+                            // Add the valueline path.
+                            svg.append("path")
+                                .attr("class", "line")
+                                .attr("d", valueline(response));
+                            //
+                            svg
+                                .selectAll("circle")
+                                .data(response)
+                                .enter()
+                                .append("circle")
+                                .attr("r", 8)
+                                .attr("cx", function (d) {
+                                    return x(d.dateTime)
+                                })
+                                .attr("cy", function (d) {
+                                    return y(d.forexBuying)
+                                })
+                                .on("mouseover", function (d, i) {
+                                    label.style("transform", "translate(" + x(d.dateTime) + "px," + (y(d.forexBuying)) + "px)")
+                                    label.text(d.forexBuying)
+                                });
+                            // Add the X Axis
+                            svg.append("g")
+                                .attr("class", "x axis")
+                                .attr("transform", "translate(0," + height + ")")
+                                .call(xAxis);
+                            // Add the Y Axis
+                            svg.append("g")
+                                .attr("class", "y axis")
+                                .call(yAxis);
+                        }
+                    });
+                } else {
+                    alert("Wrong Input")
+                }
+            });
+        }
+        else {
+            alert("No data found in the database. Please go '/api/data/save' endpoint for loading data from tcmb to database.")
+        }
+
     </script>
 }
 @section Styles

@@ -52,7 +52,7 @@ namespace ProvisionSecond.MVCApplication.Controllers
                     _currencyRepo.Insert(model);
                 }
             }
-            return Ok();
+            return Redirect("/Currency/Index");
         }
     }
 }
