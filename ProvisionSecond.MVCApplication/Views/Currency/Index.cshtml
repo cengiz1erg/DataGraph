@@ -12,8 +12,9 @@
 </div>
 <div id="containerbelow">
     <p class="label"></p>
-     <div id="myChart"></div>
- </div>
+    <div id="myChart"></div>
+    @*<svg width="500" height="400"></svg>*@
+</div>
 @section Scripts
 {
     <script>
@@ -34,6 +35,19 @@
                         error: function (request, status, error) {
                             //console.log(request);
                         },
+                        //success: function (response) {
+                        //    var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S").parse;
+                        //    response.forEach(function (d) {
+                        //        d.dateTime = parseDate(d.dateTime);
+                        //        d.forexBuying = +d.forexBuying;
+                        //    });
+                        //    var svg = d3.select("svg"),
+                        //        margin = 200,
+                        //        width = svg.attr("width") - margin,
+                        //        height = svg.attr("height") - margin
+                        //    var xScale = d3.scaleLinear().domain([0, 100]).range([0, width]),
+                        //        yScale = d3.scaleLinear().domain([0, 200]).range([height, 0]);
+                        //}
                         success: function (response) {
                             /*console.log(response);*/
                             $("#myChart").html("");
@@ -66,7 +80,7 @@
                             //
                             response.forEach(function (d) {
                                 d.dateTime = parseDate(d.dateTime);
-                                d.forexBuying = +d.forexBuying;
+                                /*d.forexBuying = +d.forexBuying;*/
                             });
                             // Scale the range of the data
                             var max = d3.max(response, function (d) { return d.forexBuying; })

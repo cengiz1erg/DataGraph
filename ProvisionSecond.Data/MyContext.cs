@@ -12,7 +12,13 @@ namespace ProvisionSecond.Data
     {
         public MyContext(DbContextOptions options) : base(options)
         {
+            
+        }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CurrencyPro>()
+                .HasIndex(c => c.Code); // Because code will be used for query. "/Currency/GetCurrency"
         }
         public DbSet<CurrencyPro> Currencies { get; set; }
     }
